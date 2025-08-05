@@ -12,7 +12,6 @@ class SizeConvert {
 
 	public SizeConvert(long bytes) {
 		
-		long oneKB = 1024;
 		long oneMB = (long) Math.pow(1024, 2);
 		long oneGB = (long) Math.pow(1024, 3);
 

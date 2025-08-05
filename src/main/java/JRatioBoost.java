@@ -1870,7 +1870,7 @@ public class JRatioBoost extends javax.swing.JFrame {
 		@Override
 		public void run() {
 			
-			int upSpeed = te.getUploadSpeed() + seed.nextInt(te.getUploadSpeed());
+			int upSpeed = te.getUploadSpeed() / 2 + seed.nextInt(te.getUploadSpeed());
 			long n = te.getUploadAmount();
 			te.setUploadAmount(n += SizeConvert.KBToB(upSpeed));
 			
