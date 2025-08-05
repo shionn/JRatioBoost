@@ -1,14 +1,39 @@
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.*;
-import java.text.*;
-import java.util.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
 import java.util.Timer;
-import java.util.regex.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -19,6 +44,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class JRatioBoost extends javax.swing.JFrame {
 	
+	private static final long serialVersionUID = 8520981629437587515L;
+
 	/**
 	 * Holds a reference to the currently selected torrent in the JList 
 	 */	
@@ -976,8 +1003,8 @@ public class JRatioBoost extends javax.swing.JFrame {
 	 */		
 	private void updateLabels(TorrentElement te) {
 
-		TorrentInfo tInfo = te.gettInfo();
-		TrackerConnect tConn = te.gettConn();
+		TorrentInfo tInfo = te.getTInfo();
+		TrackerConnect tConn = te.getTConn();
 		
 		//update Labels
 		Pattern p = Pattern.compile("//[a-z.]+");
@@ -1066,11 +1093,11 @@ public class JRatioBoost extends javax.swing.JFrame {
 			
 			//populate the torrent element object with the info found in the torrent file
 			//and add it to the torrentElement array
-			te.settInfo(new TorrentInfo(file));
+			te.setTInfo(new TorrentInfo(file));
 			torrentElement.add(te);
 
 			//display torret info on the GUI
-			TorrentInfo tInfo = te.gettInfo();
+			TorrentInfo tInfo = te.getTInfo();
 			updateLabels(te);
 			
 			//Add the torrent opened to the JList
@@ -1180,7 +1207,7 @@ public class JRatioBoost extends javax.swing.JFrame {
 		if (connectButton.getText().equals("Connect")) {
 			
 			TorrentElement te = torrentElement.get(indexSelected);
-			te.settConn(null);
+			te.setTConn(null);
 			updatePortMenu.setEnabled(false);
 			te.setUploadAmount(0);
 			connectButton.setText("Connecting..");
@@ -1387,8 +1414,8 @@ public class JRatioBoost extends javax.swing.JFrame {
 		}
 		
 		String codeVersion = String.format("%s%d", clientCode, version);
-		te.gettInfo().computePeerId(codeVersion);
-		peer_id.setText(te.gettInfo().hexString(te.gettInfo().peerId));
+		te.getTInfo().computePeerId(codeVersion);
+		peer_id.setText(te.getTInfo().hexString(te.getTInfo().peerId));
 		customClientDialog.setVisible(false);
         }//GEN-LAST:event_changeClientOkButtonActionPerformed
 
@@ -1556,7 +1583,7 @@ public class JRatioBoost extends javax.swing.JFrame {
 				indexSelected = torrentList.getSelectedIndex();
 				
 				TorrentElement te = torrentElement.get(indexSelected);
-				TorrentInfo tInfo = te.gettInfo();
+				TorrentInfo tInfo = te.getTInfo();
 				updateLabels(te);
 				uploadSpeedSpinner.setValue(te.getUploadSpeed());
 				jProgressBar1.setVisible(false);
@@ -1616,7 +1643,7 @@ public class JRatioBoost extends javax.swing.JFrame {
 	private void updateIntervalMenuActionPerformed(java.awt.event.ActionEvent evt) {
 		
 		TorrentElement te = torrentElement.get(indexSelected);
-		TrackerConnect tc = te.gettConn();
+		TrackerConnect tc = te.getTConn();
 		updateIntervalDialog.pack();
 		updateIntervalDialog.setLocationRelativeTo(null);
 		updateIntervalDialog.setVisible(true);
@@ -1630,7 +1657,7 @@ public class JRatioBoost extends javax.swing.JFrame {
 	private void kTorrentMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 
 		int n = torrentList.getSelectedIndex();
-		TorrentInfo tInfo = torrentElement.get(indexSelected).gettInfo();
+		TorrentInfo tInfo = torrentElement.get(indexSelected).getTInfo();
 		
 		tInfo.computePeerId("KT5110");
 		peer_id.setText(tInfo.hexString(tInfo.peerId));
@@ -1644,7 +1671,7 @@ public class JRatioBoost extends javax.swing.JFrame {
 	private void transmissionMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 
 		int n = torrentList.getSelectedIndex();
-		TorrentInfo tInfo = torrentElement.get(indexSelected).gettInfo();
+		TorrentInfo tInfo = torrentElement.get(indexSelected).getTInfo();
 		
 		tInfo.computePeerId("TR4050");
 		peer_id.setText(tInfo.hexString(tInfo.peerId));
@@ -1720,7 +1747,7 @@ public class JRatioBoost extends javax.swing.JFrame {
 	private class ChangeTrackerAction implements ActionListener {
 
 		int n = torrentList.getSelectedIndex();
-		TorrentInfo tInfo = torrentElement.get(indexSelected).gettInfo();
+		TorrentInfo tInfo = torrentElement.get(indexSelected).getTInfo();
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -1756,7 +1783,7 @@ public class JRatioBoost extends javax.swing.JFrame {
 		public ConnectTask (TorrentElement te) {
 		
 			this.te = te;
-			this.tInfo = te.gettInfo();
+			this.tInfo = te.getTInfo();
 		}
 		
 		//execute this method in its own background thread
@@ -1767,8 +1794,8 @@ public class JRatioBoost extends javax.swing.JFrame {
 
 			try {
 
-				te.settConn(new TrackerConnect(tInfo, te.getPort(), te.getCustomUserAgent()));
-				tc = te.gettConn();
+				te.setTConn(new TrackerConnect(tInfo, te.getPort(), te.getCustomUserAgent()));
+				tc = te.getTConn();
 				String announce = String.format("%s?info_hash=%s&peer_id=%s&port=%s&uploaded=0&downloaded=0&left=0&compact=1&event=started", tInfo.announce, tInfo.hexStringUrlEnc(0), tInfo.hexStringUrlEnc(1), tc.port);
 				te.getNumAnnouce().add(announce);
 
@@ -1832,16 +1859,18 @@ public class JRatioBoost extends javax.swing.JFrame {
 		public UpdateTask(TorrentElement te) {
 			
 			this.te = te;
-			this.tc = te.gettConn();
+			this.tc = te.getTConn();
 			this.timer = te.getTimer();
-			this.tInfo = te.gettInfo();
+			this.tInfo = te.getTInfo();
 			te.setTimeLeft(Integer.parseInt(tc.interval));
 		}
 		
+
+		Random seed = new Random();
 		@Override
 		public void run() {
 			
-			int upSpeed = te.getUploadSpeed();
+			int upSpeed = te.getUploadSpeed() + seed.nextInt(te.getUploadSpeed());
 			long n = te.getUploadAmount();
 			te.setUploadAmount(n += SizeConvert.KBToB(upSpeed));
 			

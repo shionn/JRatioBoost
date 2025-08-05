@@ -1,11 +1,21 @@
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import javax.swing.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.Timer;
 
 public class JSpinLoader extends JComponent {
 	
+	private static final long serialVersionUID = -3227525597437092042L;
 	int numSteps = 8;
 	int size = 5;
 	double rot = 0;
